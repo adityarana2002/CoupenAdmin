@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoupenAdmin — Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="nav-logo">🎟️</span>
+            <span class="nav-title">CoupenAdmin</span>
+        </div>
+        <div class="nav-actions">
+            <a th:href="@{/admin/license/new}" class="btn btn-accent">
+                ✨ Generate New License
+            </a>
+            <form th:action="@{/logout}" method="post" style="display:inline; margin:0;">
+                <button type="submit" class="btn btn-outline">🚪 Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>📊 License Dashboard</h1>
+            <p class="subtitle" th:text="'Managing ' + ${totalCount} + ' license(s)'">Managing 0 licenses</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" th:text="${totalCount}">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-card stat-active">
+                <div class="stat-number" th:text="${activeCount}">0</div>
+                <div class="stat-label">Active</div>
+            </div>
+            <div class="stat-card stat-inactive">
+                <div class="stat-number" th:text="${inactiveCount}">0</div>
+                <div class="stat-label">Inactive</div>
+            </div>
+            <div class="stat-card stat-expired">
+                <div class="stat-number" th:text="${expiredCount}">0</div>
+                <div class="stat-label">Expired</div>
+            </div>
+        </div>
+
+        <!-- Licenses Table -->
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>License Key</th>
+                        <th>Android ID</th>
+                        <th>User Name</th>
+                        <th>Expiry Date</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="license, iter : ${licenses}"
+                        th:classappend="${!license.active} ? 'row-inactive' : (${license.expiryDate.isBefore(today)} ? 'row-expired' : '')">
+                        <td th:text="${iter.count}">1</td>
+                        <td>
+                            <code class="license-key" th:text="${license.licenseKey}">XXXXXXXXXXXX</code>
+                        </td>
+                        <td>
+                            <span th:if="${license.androidId != null}" th:text="${license.androidId}"
+                                class="android-id"></span>
+                            <span th:if="${license.androidId == null}" class="text-muted">Not bound</span>
+                        </td>
+                        <td th:text="${license.userName != null ? license.userName : '—'}">—</td>
+                        <td th:text="${license.expiryDate}">2026-12-31</td>
+                        <td>
+                            <span th:if="${license.active and !license.expiryDate.isBefore(today)}"
+                                class="badge badge-active">● Active</span>
+                            <span th:if="${!license.active}" class="badge badge-inactive">● Inactive</span>
+                            <span th:if="${license.active and license.expiryDate.isBefore(today)}"
+                                class="badge badge-expired">● Expired</span>
+                        </td>
+                        <td class="text-muted"
+                            th:text="${license.createdAt != null ? license.createdAt.toLocalDate().toString() : '—'}">—
+                        </td>
+                        <td class="actions-cell">
+                            <a th:href="@{/admin/license/edit/{id}(id=${license.id})}" class="btn btn-sm btn-edit"
+                                title="Edit">✏️ Edit</a>
+                            <a th:href="@{/admin/license/toggle/{id}(id=${license.id})}" class="btn btn-sm btn-toggle"
+                                th:title="${license.active ? 'Deactivate' : 'Activate'}"
+                                th:text="${license.active ? '🔒 Lock' : '🔓 Unlock'}">🔒</a>
+                            <a th:href="@{/admin/license/delete/{id}(id=${license.id})}" class="btn btn-sm btn-delete"
+                                title="Delete"
+                                onclick="return confirm('⚠️ Are you sure you want to delete this license? This cannot be undone.')">🗑️
+                                Del</a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(licenses)}">
+                        <td colspan="8" class="empty-state">
+                            <div class="empty-icon">📋</div>
+                            <p>No licenses yet.</p>
+                            <p style="margin-top: 8px;">
+                                <a th:href="@{/admin/license/new}" class="btn btn-accent" style="display: inline-flex;">
+                                    ✨ Generate Your First License
+                                </a>
+                            </p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+
+</html>

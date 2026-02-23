@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoupenApp — Activate License</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* ======== User Login — Premium Design ======== */
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #050510;
+        }
+
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(124, 92, 252, 0.4);
+            border-radius: 50%;
+            animation: particleRise linear infinite;
+        }
+
+        @keyframes particleRise {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-10vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .user-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 460px;
+            padding: 20px;
+        }
+
+        /* ---- Main Card ---- */
+        .user-card {
+            background: rgba(18, 18, 32, 0.85);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(60, 60, 100, 0.25);
+            border-radius: 24px;
+            padding: 48px 40px;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.5), 0 0 80px rgba(124, 92, 252, 0.05);
+            animation: cardEntrance 0.35s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-card::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, rgba(124, 92, 252, 0.2), transparent 30%, transparent 70%, rgba(52, 211, 153, 0.15));
+            z-index: -1;
+            opacity: 0.5;
+        }
+
+        .user-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.02), transparent);
+            animation: shimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+
+            0%,
+            100% {
+                transform: translateX(-50%);
+            }
+
+            50% {
+                transform: translateX(50%);
+            }
+        }
+
+        @keyframes cardEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(15px) scale(0.98);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ---- Header ---- */
+        .user-header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .app-icon-wrap {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .app-icon {
+            font-size: 4rem;
+            display: block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .app-icon-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80px;
+            height: 80px;
+            border: 2px solid rgba(124, 92, 252, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: ringPulse 2.5s ease-in-out infinite;
+        }
+
+        .app-icon-ring-2 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 100px;
+            border: 1px solid rgba(124, 92, 252, 0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: ringPulse 2.5s ease-in-out infinite 0.5s;
+        }
+
+        @keyframes ringPulse {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.15);
+                opacity: 0;
+            }
+        }
+
+        .user-header h1 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #eaeaff;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .user-header p {
+            color: #9090b0;
+            font-size: 0.9rem;
+        }
+
+        .user-header .highlight {
+            color: #7c5cfc;
+            font-weight: 600;
+        }
+
+        /* ---- Key Input ---- */
+        .key-input-wrap {
+            position: relative;
+            margin-bottom: 28px;
+            animation: none;
+        }
+
+        .key-input {
+            width: 100%;
+            padding: 18px 24px;
+            background: rgba(25, 25, 45, 0.9);
+            border: 2px solid rgba(60, 60, 100, 0.3);
+            border-radius: 14px;
+            color: #eaeaff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            text-align: center;
+            text-transform: uppercase;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .key-input:focus {
+            border-color: #7c5cfc;
+            box-shadow: 0 0 0 5px rgba(124, 92, 252, 0.15), 0 0 30px rgba(124, 92, 252, 0.1);
+            background: rgba(30, 30, 55, 0.95);
+        }
+
+        .key-input::placeholder {
+            color: #4a4a6a;
+            letter-spacing: 3px;
+            font-size: 0.95rem;
+        }
+
+        .key-input.valid {
+            border-color: #34d399;
+            box-shadow: 0 0 0 5px rgba(52, 211, 153, 0.15), 0 0 30px rgba(52, 211, 153, 0.1);
+        }
+
+        .key-progress {
+            display: flex;
+            gap: 4px;
+            margin-top: 12px;
+            justify-content: center;
+        }
+
+        .key-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(60, 60, 100, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .key-dot.filled {
+            background: #7c5cfc;
+            box-shadow: 0 0 8px rgba(124, 92, 252, 0.4);
+            transform: scale(1.2);
+        }
+
+        .key-dot.valid {
+            background: #34d399;
+            box-shadow: 0 0 8px rgba(52, 211, 153, 0.4);
+        }
+
+        .key-counter-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: #5a5a7a;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ---- Activate Button ---- */
+        .activate-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #34d399, #22c97e);
+            color: #050510;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            animation: none;
+        }
+
+        .activate-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .activate-btn:hover::before {
+            left: 100%;
+        }
+
+        .activate-btn:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 8px 30px rgba(52, 211, 153, 0.35);
+        }
+
+        .activate-btn:active:not(:disabled) {
+            transform: translateY(-1px) scale(0.99);
+        }
+
+        .activate-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .activate-btn.loading {
+            background: linear-gradient(135deg, #5a5a7a, #4a4a6a) !important;
+            color: #9090b0;
+        }
+
+        /* ---- Result Messages ---- */
+        .result-box {
+            margin-top: 28px;
+            padding: 24px;
+            border-radius: 16px;
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-box.show {
+            display: block;
+            animation: resultPop 0.2s ease-out;
+        }
+
+        @keyframes resultPop {
+            0% {
+                opacity: 0;
+                transform: scale(0.9) translateY(10px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .result-success {
+            background: rgba(52, 211, 153, 0.06);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+
+        .result-error {
+            background: rgba(248, 113, 113, 0.06);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        .result-warning {
+            background: rgba(251, 191, 36, 0.06);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+
+        .result-icon {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 12px;
+            animation: none;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .result-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .result-success .result-title {
+            color: #34d399;
+        }
+
+        .result-error .result-title {
+            color: #f87171;
+        }
+
+        .result-warning .result-title {
+            color: #fbbf24;
+        }
+
+        .result-message {
+            font-size: 0.85rem;
+            color: #9090b0;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .result-details {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .detail-item {
+            text-align: center;
+        }
+
+        .detail-label {
+            font-size: 0.65rem;
+            color: #5a5a7a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 0.9rem;
+            color: #eaeaff;
+            font-weight: 600;
+        }
+
+        .detail-value.green {
+            color: #34d399;
+        }
+
+        /* ---- Footer ---- */
+        .footer-text {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 0.78rem;
+            color: #5a5a7a;
+            animation: none;
+        }
+
+        /* ---- Remember Me ---- */
+        .remember-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 16px;
+            margin-bottom: 4px;
+        }
+
+        .remember-wrap input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #7c5cfc;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .remember-wrap label {
+            font-size: 0.82rem;
+            color: #9090b0;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .footer-text a {
+            color: #7c5cfc;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .footer-text a:hover {
+            color: #a78bfa;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
+
+    <div class="user-container">
+        <div class="user-card">
+            <div class="user-header">
+                <div class="app-icon-wrap">
+                    <span class="app-icon">🎟️</span>
+                    <div class="app-icon-ring"></div>
+                    <div class="app-icon-ring-2"></div>
+                </div>
+                <h1>Activate CoupenApp</h1>
+                <p>Enter your <span class="highlight">12-digit</span> license key</p>
+            </div>
+
+            <div class="key-input-wrap">
+                <input type="text" class="key-input" id="licenseKey" maxlength="12" placeholder="XXXXXXXXXXXX"
+                    autocomplete="off" spellcheck="false" oninput="handleInput(this)">
+                <div class="key-progress" id="keyProgress"></div>
+                <div class="key-counter-text">
+                    <span id="charCount">0</span> / 12
+                </div>
+            </div>
+
+            <div class="remember-wrap">
+                <input type="checkbox" id="rememberMe" checked>
+                <label for="rememberMe">Remember my license key</label>
+            </div>
+
+            <button class="activate-btn" id="activateBtn" onclick="activateLicense()" disabled>
+                🔑 Activate License
+            </button>
+
+            <div id="resultBox" class="result-box"></div>
+
+            <div class="footer-text">
+                Need a license? <a href="https://t.me/earning9107" target="_blank">Contact administrator</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Generate particles
+        (function () {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDuration = (8 + Math.random() * 12) + 's';
+                p.style.animationDelay = Math.random() * 10 + 's';
+                p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+                const colors = ['rgba(124,92,252,0.4)', 'rgba(52,211,153,0.3)', 'rgba(96,165,250,0.3)'];
+                p.style.background = colors[Math.floor(Math.random() * colors.length)];
+                container.appendChild(p);
+            }
+        })();
+
+        // Generate progress dots
+        (function () {
+            const progress = document.getElementById('keyProgress');
+            for (let i = 0; i < 12; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'key-dot';
+                dot.id = 'dot-' + i;
+                progress.appendChild(dot);
+            }
+        })();
+
+        // Load saved license key on page load
+        (function () {
+            const savedKey = localStorage.getItem('coupen_saved_key');
+            if (savedKey && savedKey.length === 12) {
+                const input = document.getElementById('licenseKey');
+                input.value = savedKey;
+                handleInput(input);
+            }
+        })();
+
+        function handleInput(el) {
+            el.value = el.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const len = el.value.length;
+            document.getElementById('charCount').textContent = len;
+
+            // Update progress dots
+            for (let i = 0; i < 12; i++) {
+                const dot = document.getElementById('dot-' + i);
+                dot.className = 'key-dot' + (i < len ? (len === 12 ? ' valid' : ' filled') : '');
+            }
+
+            // Update input style
+            el.className = 'key-input' + (len === 12 ? ' valid' : '');
+            document.getElementById('activateBtn').disabled = len !== 12;
+        }
+
+        function getAndroidId() {
+            let storedId = localStorage.getItem('coupen_android_id');
+            if (storedId) return storedId;
+            const chars = '0123456789abcdef';
+            let id = '';
+            for (let i = 0; i < 16; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
+            localStorage.setItem('coupen_android_id', id);
+            return id;
+        }
+
+        async function activateLicense() {
+            const licenseKey = document.getElementById('licenseKey').value.trim();
+            const btn = document.getElementById('activateBtn');
+            const resultBox = document.getElementById('resultBox');
+
+            if (licenseKey.length !== 12) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<span style="display:inline-block;animation:pulse 1s infinite">⏳</span> Verifying...';
+            btn.classList.add('loading');
+            resultBox.className = 'result-box';
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        licenseKey: licenseKey,
+                        androidId: getAndroidId(),
+                        userName: ''
+                    })
+                });
+                const data = await response.json();
+
+                // Save or remove key based on Remember Me checkbox
+                if (document.getElementById('rememberMe').checked) {
+                    localStorage.setItem('coupen_saved_key', licenseKey);
+                } else {
+                    localStorage.removeItem('coupen_saved_key');
+                }
+
+                showResult(data);
+            } catch (error) {
+                showResult({
+                    success: false,
+                    status: 'NETWORK_ERROR',
+                    message: 'Unable to connect to server.',
+                    action: 'Please check your internet connection and try again.'
+                });
+            } finally {
+                btn.innerHTML = '🔑 Activate License';
+                btn.classList.remove('loading');
+                handleInput(document.getElementById('licenseKey'));
+            }
+        }
+
+        function showResult(data) {
+            const box = document.getElementById('resultBox');
+
+            if (data.success) {
+                box.className = 'result-box result-success show';
+                box.innerHTML = `
+                    <div class="result-icon">✅</div>
+                    <div class="result-title">License Activated!</div>
+                    <div class="result-message">${data.message}</div>
+                    <div class="result-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Expires</div>
+                            <div class="detail-value">${data.expiryDate}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Days Left</div>
+                            <div class="detail-value green">${data.daysRemaining}</div>
+                        </div>
+                        ${data.userName ? `
+                        <div class="detail-item">
+                            <div class="detail-label">User</div>
+                            <div class="detail-value">${data.userName}</div>
+                        </div>` : ''}
+                    </div>
+                `;
+            } else if (data.status === 'EXPIRED') {
+                box.className = 'result-box result-warning show';
+                box.innerHTML = `
+                    <div class="result-icon">⏰</div>
+                    <div class="result-title">License Expired</div>
+                    <div class="result-message">${data.message}<br><strong>${data.action}</strong></div>
+                `;
+            } else {
+                box.className = 'result-box result-error show';
+                const icons = {
+                    INVALID_KEY: '🔑',
+                    DEVICE_MISMATCH: '📱',
+                    DEACTIVATED: '🚫',
+                    NETWORK_ERROR: '📡'
+                };
+                box.innerHTML = `
+                    <div class="result-icon">${icons[data.status] || '❌'}</div>
+                    <div class="result-title">${data.message}</div>
+                    <div class="result-message">${data.action || ''}</div>
+                `;
+            }
+        }
+
+        // Enter key to submit
+        document.getElementById('licenseKey').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && this.value.length === 12) activateLicense();
+        });
+    </script>
+</body>
+
+</html>

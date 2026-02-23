@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${isNew} ? 'Generate New License' : 'Edit License'">License Form</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+    <div class="grid-overlay"></div>
+
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="nav-logo">🎟️</span>
+            <span class="nav-title">CoupenAdmin</span>
+        </div>
+        <div class="nav-actions">
+            <a th:href="@{/admin/dashboard}" class="btn btn-outline">← Back to Dashboard</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h1 th:text="${isNew} ? '✨ Generate New License' : '✏️ Edit License'">License Form</h1>
+                <p th:if="${isNew}" class="subtitle">A unique 12-character license key will be auto-generated</p>
+            </div>
+
+            <form th:action="@{/admin/license/save}" method="post" class="license-form">
+                <!-- Hidden ID for edits -->
+                <input th:if="${!isNew}" type="hidden" name="id" th:value="${license.id}">
+
+                <!-- License Key (read-only for edits) -->
+                <div th:if="${!isNew}" class="form-group">
+                    <label>License Key</label>
+                    <div class="key-display">
+                        <code th:text="${license.licenseKey}">XXXXXXXXXXXX</code>
+                    </div>
+                </div>
+
+                <!-- User Name -->
+                <div class="form-group">
+                    <label for="userName">User Name</label>
+                    <input type="text" id="userName" name="userName" th:value="${license.userName}"
+                        placeholder="Enter user name (optional)">
+                </div>
+
+                <!-- Expiry Date -->
+                <div class="form-group">
+                    <label for="expiryDate">Expiry Date</label>
+                    <input type="date" id="expiryDate" name="expiryDate" th:value="${license.expiryDate}" required>
+                </div>
+
+                <!-- Android ID (editable only on edit) -->
+                <div th:if="${!isNew}" class="form-group">
+                    <label for="androidId">Android ID</label>
+                    <input type="text" id="androidId" name="androidId" th:value="${license.androidId}"
+                        placeholder="Auto-filled when user activates">
+                </div>
+
+                <!-- Active Status (edit only) -->
+                <div th:if="${!isNew}" class="form-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" name="isActive" th:checked="${license.isActive()}" value="true">
+                        <span class="toggle-text">License Active</span>
+                    </label>
+                    <input type="hidden" name="isActive" value="false">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <span th:text="${isNew} ? '🔑 Generate & Save' : '💾 Save Changes'">Save</span>
+                    </button>
+                    <a th:href="@{/admin/dashboard}" class="btn btn-outline">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</body>
+
+</html>
