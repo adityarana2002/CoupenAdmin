@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 
 @Configuration
 @EnableWebSecurity
@@ -28,10 +29,15 @@ public class SecurityConfig {
                                 .csrf(csrf -> csrf
                                                 .ignoringRequestMatchers("/api/**"))
                                 .authorizeHttpRequests(auth -> auth
+                                                // API endpoints — accessible by Android app (no session)
                                                 .requestMatchers("/api/**").permitAll()
-                                                .requestMatchers("/user/**").permitAll()
+                                                // User login page — only the specific paths needed by the app
+                                                .requestMatchers("/user/login").permitAll()
+                                                // Static resources
                                                 .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                                                // Admin login page
                                                 .requestMatchers("/login").permitAll()
+                                                // Everything else requires authentication
                                                 .requestMatchers("/admin/**").authenticated()
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
@@ -43,7 +49,26 @@ public class SecurityConfig {
                                                 .logoutSuccessUrl("/login?logout")
                                                 .invalidateHttpSession(true)
                                                 .deleteCookies("JSESSIONID")
-                                                .permitAll());
+                                                .permitAll())
+                                // ── Security Headers ──
+                                .headers(headers -> headers
+                                                // Prevent clickjacking — no framing allowed
+                                                .frameOptions(frame -> frame.deny())
+                                                // Prevent MIME type sniffing
+                                                .contentTypeOptions(contentType -> {})
+                                                // Enforce HTTPS via HSTS (1 year, include subdomains)
+                                                .httpStrictTransportSecurity(hsts -> hsts
+                                                                .includeSubDomains(true)
+                                                                .maxAgeInSeconds(31536000))
+                                                // Control referrer information
+                                                .referrerPolicy(referrer -> referrer
+                                                                .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                                                // Prevent XSS attacks
+                                                .xssProtection(xss -> {})
+                                                // Content Security Policy
+                                                .contentSecurityPolicy(csp -> csp
+                                                                .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"))
+                                );
                 return http.build();
         }
 

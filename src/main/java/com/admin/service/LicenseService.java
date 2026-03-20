@@ -159,6 +159,57 @@ public class LicenseService {
         return response;
     }
 
+    /**
+     * Secure validation with device binding check.
+     * Verifies the androidId matches the one registered to this license.
+     * Used by the new POST /api/validate endpoint.
+     */
+    public Map<String, Object> checkValidityWithDevice(String licenseKey, String androidId) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<License> optLicense = licenseRepository.findByLicenseKey(licenseKey);
+
+        if (optLicense.isEmpty()) {
+            response.put("success", false);
+            response.put("status", "INVALID_KEY");
+            response.put("message", "This license key does not exist.");
+            return response;
+        }
+
+        License license = optLicense.get();
+
+        if (!license.isActive()) {
+            response.put("success", false);
+            response.put("status", "DEACTIVATED");
+            response.put("message", "Your license has been deactivated.");
+            return response;
+        }
+
+        if (license.getExpiryDate().isBefore(LocalDate.now())) {
+            response.put("success", false);
+            response.put("status", "EXPIRED");
+            response.put("message", "Your license expired on " + license.getExpiryDate() + ".");
+            return response;
+        }
+
+        // Verify device binding — the androidId must match
+        if (license.getAndroidId() != null && !license.getAndroidId().isEmpty()
+                && !license.getAndroidId().equals(androidId)) {
+            response.put("success", false);
+            response.put("status", "DEVICE_MISMATCH");
+            response.put("message", "This license is registered to a different device.");
+            return response;
+        }
+
+        response.put("success", true);
+        response.put("status", "VALID");
+        response.put("message", "License is active and valid.");
+        response.put("expiryDate", license.getExpiryDate().toString());
+        response.put("userName", license.getUserName());
+        response.put("daysRemaining",
+                java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), license.getExpiryDate()));
+        return response;
+    }
+
     public List<License> getAllLicenses() {
         return licenseRepository.findAll();
     }
